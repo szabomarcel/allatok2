@@ -33,7 +33,7 @@ class Database{
     }
     
     public function register($name, $pass) {
-        $stmt = $this->prepare('INSERT INTO `users`(`name`, `password`) VALUES(?,?);') ;
+        $stmt = $this->prepare('INSERT INTO `users`(`name`, `password`) VALUES(?, ?, ?);') ;
         $stmt->bind_param("sb", $name, password_hash($pass, PASSWORD_BCRYPT));
         if($stmt->execute()){
             $_SESSION['login'] = true;
