@@ -1,7 +1,7 @@
 <?php
 class Database{
     private $db = null;
-     public function __construct($host,  $username, $pass, $db) {
+    public function __construct($host,  $username, $pass, $db) {
         $this->db = new mysqli($host,$username, $pass, $db);
     }
     public function login($name, $pass) {
@@ -13,7 +13,7 @@ class Database{
             //-- sikeres végrehajtás után lekérjük az adatokat
             $result = $stmt ->get_result();
             $row = $result ->fetch_assoc();
-            if (password_verify($pass, $row('password'))){
+            if (password_verify($pass('password'), $row)){
                 //-- felhasználónév és jelszó helyes
                 $_SESSION['username'] = $row('name');
                 $_SESSION['login'] = true;
@@ -33,11 +33,17 @@ class Database{
     }
     
     public function register($name, $pass) {
-        $stmt = $this->prepare('INSERT INTO `users`(`name`, `password`) VALUES(?, ?, ?);') ;
+        $password = password_hash($pass, PASSWORD_BCRYPT);
+        var_dump($password);
+        $stmt = $this->db->prepare("INSERT INTO `users` (`name`, `password`) VALUES (?, ?);");
         $stmt->bind_param("sb", $name, password_hash($pass, PASSWORD_BCRYPT));
         if($stmt->execute()){
             $_SESSION['login'] = true;
             header("Location: index.php");
+        }
+        else {
+            $_SESSION['login'] = false;
+            echo '<p>Rögzítés sikertelen!</p>';
         }
     }
 }
